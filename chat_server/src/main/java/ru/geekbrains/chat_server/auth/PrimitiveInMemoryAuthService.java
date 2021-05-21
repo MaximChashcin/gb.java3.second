@@ -20,13 +20,25 @@ public class PrimitiveInMemoryAuthService implements AuthService {
     }
 
     @Override
-    public void start() {
+    public boolean start() {
         System.out.println("Auth service started");
+        return true;
     }
 
     @Override
     public void stop() {
         System.out.println("Auth service stopped");
+    }
+
+    @Override
+    public boolean registerUser(String login, String password) {
+        for (User user : users) {
+            if (user.getLogin().equals(login))
+                return false;
+        }
+
+        users.add(new User("user" + users.size(), login, password));
+        return true;
     }
 
     @Override
@@ -38,12 +50,12 @@ public class PrimitiveInMemoryAuthService implements AuthService {
     }
 
     @Override
-    public String changeUsername(String oldName, String newName) {
-        return null;
+    public boolean changeUsername(String oldName, String password, String newName) {
+        return false;
     }
 
     @Override
-    public String changePassword(String username, String oldPassword, String newPassword) {
-        return null;
+    public boolean changePassword(String username, String newPassword) {
+        return false;
     }
 }

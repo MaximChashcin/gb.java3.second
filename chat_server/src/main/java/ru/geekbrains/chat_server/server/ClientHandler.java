@@ -33,19 +33,41 @@ public class ClientHandler {
     public void handle() {
         new Thread(() -> {
             try {
-                authenticate();
-                readMessages();
+                handleClientMessages();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }).start();
     }
 
-    private void readMessages() throws IOException {
+    private void handleClientMessages() throws IOException {
+        while (!Thread.currentThread().isInterrupted() || socket.isConnected()) {
+            String msg = inputStream.readUTF();
+            ChatMessage message = ChatMessage.unmarshall(msg);
+
+            switch (message.getMessageType()) {
+                case PUBLIC:
+                case PRIVATE:
+                    readMessage(message);
+                    break;
+                case SEND_AUTH:
+                    authenticate(message);
+                    break;
+                case SEND_REGISTER:
+                    register(message);
+                    break;
+                case CHANGE_USERNAME:
+                    updateLogin(message);
+                    break;
+                case CHANGE_PASSWORD:
+                    updatePwd(message);
+                    break;
+            }
+        }
+    }
+
+    private void readMessage(ChatMessage message) throws IOException {
         try {
-            while (!Thread.currentThread().isInterrupted() || socket.isConnected()) {
-                String msg = inputStream.readUTF();
-                ChatMessage message = ChatMessage.unmarshall(msg);
                 message.setFrom(this.currentUsername);
                 switch (message.getMessageType()) {
                     case PUBLIC:
@@ -55,10 +77,7 @@ public class ClientHandler {
                         chatServer.sendPrivateMessage(message);
                         break;
                 }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
+        }  finally {
             closeHandler();
         }
     }
@@ -75,62 +94,64 @@ public class ClientHandler {
         return this.currentUsername;
     }
 
-    private void authenticate() {
+    private void register(ChatMessage msg) {
+        System.out.println("Started client  register");
 
-        Timer timer = new Timer(true);
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                try {
-                    synchronized (this) {
-                        if (currentUsername == null) {
-                            ChatMessage response = new ChatMessage();
-                            response.setMessageType(MessageType.ERROR);
-                            response.setBody("Authentication timeout!\nPlease, try again later!");
-                            sendMessage(response);
-                            Thread.sleep(50);
-                            socket.close();
-                        }
-                    }
-                } catch (InterruptedException | IOException e) {
-                    e.getStackTrace();
-                }
-            }
-        }, AUTH_TIMEOUT);
+        if(chatServer.getAuthService().registerUser(msg.getLogin(), msg.getPassword()))
+            return;
 
+        ChatMessage response = new ChatMessage();
+        response.setMessageType(MessageType.ERROR);
+        response.setBody("Error while register");
+        sendMessage(response);
 
+    }
+
+    private void updatePwd(ChatMessage msg) {
+        System.out.println("Started client update pwd");
+
+        if(chatServer.getAuthService().changePassword(msg.getLogin(), msg.getPassword()))
+            return;
+
+        ChatMessage response = new ChatMessage();
+        response.setMessageType(MessageType.ERROR);
+        response.setBody("Error while creating");
+        sendMessage(response);
+
+    }
+
+    private void updateLogin(ChatMessage msg) {
+        System.out.println("Started client update login");
+
+        ChatMessage response = new ChatMessage();
+        response.setMessageType(MessageType.ERROR);
+        response.setBody("Currently unsupproted");
+        sendMessage(response);
+    }
+
+    private void authenticate(ChatMessage msg) {
         System.out.println("Started client  auth...");
 
-        try {
-            while (true) {
-                String authMessage = inputStream.readUTF();
-                System.out.println("Auth received");
-                ChatMessage msg = ChatMessage.unmarshall(authMessage);
-                String username = chatServer.getAuthService().getUsernameByLoginAndPassword(msg.getLogin(), msg.getPassword());
-                ChatMessage response = new ChatMessage();
+        String username = chatServer.getAuthService().getUsernameByLoginAndPassword(msg.getLogin(), msg.getPassword());
+        ChatMessage response = new ChatMessage();
 
-                if (username == null) {
-                    response.setMessageType(MessageType.ERROR);
-                    response.setBody("Wrong username or password!");
-                    System.out.println("Wrong credentials");
-                } else if (chatServer.isUserOnline(username)) {
-                    response.setMessageType(MessageType.ERROR);
-                    response.setBody("Double auth!");
-                    System.out.println("Double auth!");
-                } else {
-                    response.setMessageType(MessageType.AUTH_CONFIRM);
-                    response.setBody(username);
-                    currentUsername = username;
-                    chatServer.subscribe(this);
-                    System.out.println("Subscribed");
-                    sendMessage(response);
-                    break;
-                }
-                sendMessage(response);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (username == null) {
+            response.setMessageType(MessageType.ERROR);
+            response.setBody("Wrong username or password!");
+            System.out.println("Wrong credentials");
+        } else if (chatServer.isUserOnline(username)) {
+            response.setMessageType(MessageType.ERROR);
+            response.setBody("Double auth!");
+            System.out.println("Double auth!");
+        } else {
+            response.setMessageType(MessageType.AUTH_CONFIRM);
+            response.setBody(username);
+            currentUsername = username;
+            chatServer.subscribe(this);
+            System.out.println("Subscribed");
+            sendMessage(response);
         }
+        sendMessage(response);
     }
 
     public void closeHandler() {

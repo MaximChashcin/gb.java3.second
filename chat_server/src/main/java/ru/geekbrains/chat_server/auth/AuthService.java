@@ -1,10 +1,10 @@
 package ru.geekbrains.chat_server.auth;
 
 public interface AuthService {
-    void start();
+    boolean start();
     void stop();
+    boolean registerUser(String login, String password);
     String getUsernameByLoginAndPassword(String login, String password);
-    String changeUsername(String oldName, String newName);
-    String changePassword(String username, String oldPassword, String newPassword);
-
+    boolean changeUsername(String oldName, String password, String newName);
+    boolean changePassword(String username, String password);
 }
