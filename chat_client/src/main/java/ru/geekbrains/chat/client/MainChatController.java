@@ -38,6 +38,9 @@ public class MainChatController implements Initializable, MessageProcessor {
     public TextField loginField;
     public PasswordField passwordField;
     public Button btnSendAuth;
+    public Button btnSendRegister;
+    public Button btnSendUpdatePwd;
+    public Button btnSendUpdateLogin;
     private ChatMessageService messageService;
     private String currentName;
 
@@ -174,7 +177,7 @@ public class MainChatController implements Initializable, MessageProcessor {
         this.onlineUsers.getSelectionModel().selectFirst();
     }
 
-    public void sendAuth(ActionEvent actionEvent) {
+    public void send(ActionEvent actionEvent, MessageType type) {
         try {
             if (!messageService.isConnected()) messageService.connect();
         } catch (Exception e) {
@@ -185,9 +188,25 @@ public class MainChatController implements Initializable, MessageProcessor {
         String pass = passwordField.getText();
         if (log.isEmpty() || pass.isEmpty()) return;
         ChatMessage msg = new ChatMessage();
-        msg.setMessageType(MessageType.SEND_AUTH);
+        msg.setMessageType(type);
         msg.setLogin(log);
         msg.setPassword(pass);
         messageService.send(msg.marshall());
+    }
+
+    public void sendAuth(ActionEvent actionEvent) {
+        send(actionEvent, MessageType.SEND_AUTH);
+    }
+
+    public void register(ActionEvent actionEvent) {
+        send(actionEvent, MessageType.SEND_REGISTER);
+    }
+
+    public void updatePwd(ActionEvent actionEvent) {
+        send(actionEvent, MessageType.CHANGE_PASSWORD);
+    }
+
+    public void updateLogin(ActionEvent actionEvent) {
+        send(actionEvent, MessageType.CHANGE_USERNAME);
     }
 }

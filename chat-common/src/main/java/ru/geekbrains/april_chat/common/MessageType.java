@@ -4,6 +4,8 @@ public enum MessageType {
     PUBLIC,
     PRIVATE,
     CLIENT_LIST,
+    SEND_REGISTER,
+    REGISTER_CONFIRM,
     SEND_AUTH,
     AUTH_CONFIRM,
     CHANGE_USERNAME,

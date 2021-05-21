@@ -41,6 +41,9 @@
             <TextField fx:id="loginField"/>
             <PasswordField fx:id="passwordField"/>
             <Button fx:id="btnSendAuth" text="log in" onAction="#sendAuth"/>
+            <Button fx:id="btnSendRegister" text="register" onAction="#register"/>
+            <Button fx:id="btnSendUpdatePwd" text="update password" onAction="#updatePwd"/>
+            <Button fx:id="btnSendUpdateLogin" text="update login" onAction="#updateLogin"/>
         </HBox>
         <HBox VBox.vgrow="ALWAYS">
             <TextArea fx:id="chatArea" editable="false" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
