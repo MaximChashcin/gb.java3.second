@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<VBox prefHeight="600" prefWidth="800" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.geekbrains.chat.client.MainChatController">
+    <children>
+        <MenuBar>
+            <Menu text="File">
+                <MenuItem onAction="#mockAction" text="Item1" />
+                <MenuItem onAction="#mockAction" text="Item2" />
+                <MenuItem onAction="#mockAction" text="Item3" />
+                <MenuItem onAction="#mockAction" text="Item4" />
+                <MenuItem onAction="#exit" text="Exit" />
+            </Menu>
+            <Menu text="Edit">
+                <MenuItem onAction="#mockAction" text="Item1" />
+                <MenuItem onAction="#mockAction" text="Item2" />
+                <MenuItem onAction="#mockAction" text="Item3" />
+                <MenuItem onAction="#mockAction" text="Item4" />
+                <MenuItem onAction="#mockAction" text="Item5" />
+            </Menu>
+            <Menu text="View">
+                <MenuItem onAction="#mockAction" text="Item1" />
+                <MenuItem onAction="#mockAction" text="Item2" />
+                <MenuItem onAction="#mockAction" text="Item3" />
+                <MenuItem onAction="#mockAction" text="Item4" />
+                <MenuItem onAction="#mockAction" text="Item5" />
+            </Menu>
+            <Menu text="Help">
+                <MenuItem onAction="#mockAction" text="Item1" />
+                <MenuItem onAction="#mockAction" text="Item2" />
+                <MenuItem onAction="#mockAction" text="Item3" />
+                <MenuItem onAction="#showHelp" text="Help" />
+                <MenuItem onAction="#showAbout" text="About" />
+            </Menu>
+        </MenuBar>
+        <HBox>
+            <TextField fx:id="loginField"/>
+            <PasswordField fx:id="passwordField"/>
+            <Button fx:id="btnSendAuth" text="log in" onAction="#sendAuth"/>
+        </HBox>
+        <HBox VBox.vgrow="ALWAYS">
+            <TextArea fx:id="chatArea" editable="false" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
+                <HBox.margin>
+                    <Insets left="5.0" right="5.0" />
+                </HBox.margin>
+            </TextArea>
+            <ListView fx:id="onlineUsers" prefWidth="150.0">
+                <HBox.margin>
+                    <Insets left="5.0" right="5.0" />
+                </HBox.margin>
+            </ListView>
+            <padding>
+                <Insets bottom="5.0" top="5.0" />
+            </padding>
+
+        </HBox>
+        <HBox>
+            <TextField fx:id="inputField" onAction="#sendMessage" prefHeight="70.0" HBox.hgrow="ALWAYS">
+                <HBox.margin>
+                    <Insets left="5.0" right="5.0" />
+                </HBox.margin>
+            <font>
+               <Font size="24.0" />
+            </font>
+            </TextField>
+            <Button fx:id="btnSendMessage" onAction="#sendMessage" prefHeight="70.0" prefWidth="150.0" text="SEND">
+                <HBox.margin>
+                    <Insets left="5.0" right="5.0" />
+                </HBox.margin>
+            </Button>
+            <padding>
+                <Insets bottom="5.0" top="5.0" />
+            </padding>
+        </HBox>
+    </children>
+</VBox>
